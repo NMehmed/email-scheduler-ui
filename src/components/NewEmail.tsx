@@ -12,7 +12,7 @@ interface INewEmailState {
   emailTo: string,
   message: string,
   isRecurrent: boolean,
-  whenToSendIt: Date,
+  whenToBeSent: Date,
   whichWeeksDaysToBeSent: Array<Weekdays>,
   isLoading: boolean,
 }
@@ -20,12 +20,14 @@ interface INewEmailState {
 class NewEmail extends React.Component<IProps, INewEmailState> {
   constructor(props: any) {
     super(props)
+    console.log('-----')
+    console.log(process.env)
 
     this.state = {
       emailTo: '',
       message: '',
       isRecurrent: false,
-      whenToSendIt: new Date(),
+      whenToBeSent: new Date(),
       whichWeeksDaysToBeSent: [],
       isLoading: false
     }
@@ -56,8 +58,26 @@ class NewEmail extends React.Component<IProps, INewEmailState> {
     this.setState({ whichWeeksDaysToBeSent })
   }
 
-  scheduleNewEmail = () => {
+  scheduleNewEmail = async () => {
     this.setState({ isLoading: true })
+
+    const url = `${process.env.REACT_APP_API_SERVER_URL}/send-mail`
+    const body = JSON.stringify({
+      emailTo: this.state.emailTo,
+      message: this.state.message,
+      whenToBeSent: this.state.whenToBeSent.toISOString()
+    })
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      mode: 'cors',
+      body
+    }).then(res => res.json())
+
+    this.setState({ isLoading: false })
   }
 
   render() {
