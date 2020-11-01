@@ -1,17 +1,19 @@
 import React from 'react'
+import { isPropertySignature } from 'typescript'
 
 interface ITextAreaFieldProps {
   label?: string,
   value: string,
   handleChange: Function,
+  placeholder?: string,
 }
 
-export default ({ label = 'Message', value, handleChange }: ITextAreaFieldProps) => {
+export default ({ label = 'Message', value, handleChange, placeholder = '' }: ITextAreaFieldProps) => {
   return (
     <div className="field">
       <label className="label">{label}</label>
       <div className="control">
-        <textarea className="textarea" placeholder="Textarea" onChange={e => handleChange(e)} value={value} />
+        <textarea className="textarea" placeholder={placeholder} onChange={e => handleChange(e)} value={value} />
       </div>
     </div>
   )
