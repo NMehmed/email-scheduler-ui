@@ -6,6 +6,7 @@ import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 
 interface IWhenToStopMailsFieldProps {
+  value: IWhenToStopMailsState,
   onChange: Function,
 }
 
@@ -13,11 +14,7 @@ class WhenToStopMailsField extends React.Component<IWhenToStopMailsFieldProps, I
   constructor(props: IWhenToStopMailsFieldProps) {
     super(props)
 
-    this.state = {
-      whenToStop: WhenToStop.never,
-      stopDate: new Date(),
-      occurrancy: 0,
-    }
+    this.state = props.value
   }
 
   onWhenToStopChange = (e: React.FormEvent<HTMLInputElement>) => {
@@ -45,8 +42,7 @@ class WhenToStopMailsField extends React.Component<IWhenToStopMailsFieldProps, I
         <div className="control mb-4">
           <label className="radio mr-4">
             <input type="radio" name="answer" value={WhenToStop.onDate} checked={this.state.whenToStop === WhenToStop.onDate} onChange={this.onWhenToStopChange} />
-          Stop sending on
-
+            Stop sending on
           </label>
           <DatePicker
             selected={this.state.stopDate}
@@ -59,11 +55,11 @@ class WhenToStopMailsField extends React.Component<IWhenToStopMailsFieldProps, I
         <div className="control mb-4">
           <label className="radio mr-4">
             <input type="radio" name="answer" value={WhenToStop.afterSomeOccurency} checked={this.state.whenToStop === WhenToStop.afterSomeOccurency} onChange={this.onWhenToStopChange} />
-          After
-        </label>
+            After
+          </label>
           <label>
             <input value={this.state.occurrancy} min="1" style={{ width: '80px' }} className="input mr-4" type="number" onChange={this.onOcurrancyChange} disabled={this.state.whenToStop !== WhenToStop.afterSomeOccurency} />
-              occurrences
+            occurrences
           </label>
         </div>
       </div>

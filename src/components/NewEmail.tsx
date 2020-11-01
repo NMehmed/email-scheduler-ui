@@ -8,6 +8,7 @@ import TextInputField from './fields/TextInputField'
 import NumberInputField from './fields/NumberInputField'
 import WhenToStopMailsField from './fields/WhenToStopMailsField'
 import IWhenToStopMailsState from '../types/IWhenToStopMailsState'
+import WhenToStop from '../enums/WhenToStop'
 
 interface IProps {
 }
@@ -21,7 +22,7 @@ interface INewEmailState {
   whichWeeksDaysToBeSent: Array<Weekdays>,
   isLoading: boolean,
   dayOfMonth: number | null,
-  whenToStopMails: IWhenToStopMailsState | null
+  whenToStopMails: IWhenToStopMailsState,
 }
 
 class NewEmail extends React.Component<IProps, INewEmailState> {
@@ -37,7 +38,11 @@ class NewEmail extends React.Component<IProps, INewEmailState> {
       whichWeeksDaysToBeSent: [],
       isLoading: false,
       dayOfMonth: null,
-      whenToStopMails: null,
+      whenToStopMails: {
+        whenToStop: WhenToStop.never,
+        occurrancy: 1,
+        stopDate: new Date(),
+      },
     }
   }
 
@@ -138,7 +143,7 @@ class NewEmail extends React.Component<IProps, INewEmailState> {
       <div>
         <NumberInputField label="Every day of month" value={this.state.dayOfMonth} handleChange={this.dayOfMonthChange} min={1} max={31} />
         <WeekDaysPicker label="Repeat on:" values={this.state.whichWeeksDaysToBeSent} handleChange={this.weekdayChange} />
-        <WhenToStopMailsField onChange={this.onWhenToStopMailsChange} />
+        <WhenToStopMailsField value={this.state.whenToStopMails} onChange={this.onWhenToStopMailsChange} />
       </div>
     )
   }
