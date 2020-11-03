@@ -9,6 +9,11 @@ import NumberInputField from './fields/NumberInputField'
 import WhenToStopMailsField from './fields/WhenToStopMailsField'
 import IWhenToStopMailsState from '../types/IWhenToStopMailsState'
 import WhenToStop from '../enums/WhenToStop'
+import TimePicker from 'rc-time-picker'
+import IAlertProps from '../types/IAlertProps'
+
+import 'rc-time-picker/assets/index.css';
+import Alert from './alerts/Alert'
 
 interface IProps {
 }
@@ -23,6 +28,9 @@ interface INewEmailState {
   isLoading: boolean,
   dayOfMonth: number | null,
   whenToStopMails: IWhenToStopMailsState,
+  tickTime: string | null,
+  showAlert: boolean,
+  alertProps: IAlertProps,
 }
 
 class NewEmail extends React.Component<IProps, INewEmailState> {
@@ -38,11 +46,17 @@ class NewEmail extends React.Component<IProps, INewEmailState> {
       whichWeeksDaysToBeSent: [],
       isLoading: false,
       dayOfMonth: null,
+      tickTime: null,
       whenToStopMails: {
         whenToStop: WhenToStop.never,
         occurrancy: 1,
         stopDate: new Date(),
       },
+      showAlert: false,
+      alertProps: {
+        status: 'success',
+        message: '',
+      }
     }
   }
 
@@ -83,6 +97,14 @@ class NewEmail extends React.Component<IProps, INewEmailState> {
     this.setState({ whenToStopMails })
   }
 
+  onTickTimeChange = (time: any) => {
+    this.setState({ tickTime: time.format('HH:mm') })
+  }
+
+  onAlertClose = () => {
+    this.setState({ showAlert: false })
+  }
+
   onSubmit = async () => {
     this.setState({ isLoading: true })
 
@@ -95,7 +117,7 @@ class NewEmail extends React.Component<IProps, INewEmailState> {
     this.setState({ isLoading: false })
   }
 
-  sendMail = () => {
+  sendMail = async () => {
     const url = `${process.env.REACT_APP_API_SERVER_URL}/send-mail`
     const body = JSON.stringify({
       emailTo: this.state.emailTo,
@@ -104,17 +126,35 @@ class NewEmail extends React.Component<IProps, INewEmailState> {
       whenToBeSent: this.state.whenToBeSent.toISOString(),
     })
 
-    return fetch(url, {
+    const response = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       mode: 'cors',
       body
-    })
+    }).then(res => res.json())
+
+    if (response.awesome) {
+      this.setState({
+        showAlert: true,
+        alertProps: {
+          status: 'success',
+          message: 'Mail sent successfully',
+        }
+      })
+    } else {
+      this.setState({
+        showAlert: true,
+        alertProps: {
+          status: 'error',
+          message: `Failed to send mail ${response.message ? response.message : ''}`
+        }
+      })
+    }
   }
 
-  scheduleNewEmail = () => {
+  scheduleNewEmail = async () => {
     const url = `${process.env.REACT_APP_API_SERVER_URL}/schedule-mail`
     const body = JSON.stringify({
       emailTo: this.state.emailTo,
@@ -128,21 +168,47 @@ class NewEmail extends React.Component<IProps, INewEmailState> {
       },
     })
 
-    return fetch(url, {
+    const response = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       mode: 'cors',
       body
-    })
+    }).then(res => res.json())
+
+    if (response.awesome) {
+      this.setState({
+        showAlert: true,
+        alertProps: {
+          status: 'success',
+          message: 'Scheduled successfully',
+        }
+      })
+    } else {
+      this.setState({
+        showAlert: true,
+        alertProps: {
+          status: 'error',
+          message: `Failed to schedule mail ${response.message ? response.message : ''}`
+        }
+      })
+    }
   }
 
   renderRecurrentMailOptions = () => {
     return (
       <div>
-        <NumberInputField label="Every day of month" value={this.state.dayOfMonth} handleChange={this.dayOfMonthChange} min={1} max={31} />
+        <div className="control">
+          <label className="label">
+            Time of day
+            <div>
+              <TimePicker showSecond={false} onChange={this.onTickTimeChange} />
+            </div>
+          </label>
+        </div>
         <WeekDaysPicker label="Repeat on:" values={this.state.whichWeeksDaysToBeSent} handleChange={this.weekdayChange} />
+        <NumberInputField label="Every day of month" value={this.state.dayOfMonth} handleChange={this.dayOfMonthChange} min={1} max={31} />
         <WhenToStopMailsField value={this.state.whenToStopMails} onChange={this.onWhenToStopMailsChange} />
       </div>
     )
@@ -151,6 +217,9 @@ class NewEmail extends React.Component<IProps, INewEmailState> {
   render() {
     return (
       <div className="container" >
+        {this.state.showAlert &&
+          <Alert message={this.state.alertProps.message} status={this.state.alertProps.status} onCloseClick={this.onAlertClose} />
+        }
         <EmailField value={this.state.emailTo} handleChange={this.emailChange} />
         <TextInputField label="Subject" placeholder="Email Subject" value={this.state.subject} handleChange={this.subjectChange} />
         <TextAreaField value={this.state.message} handleChange={this.messageChange} />
