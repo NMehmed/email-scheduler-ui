@@ -166,6 +166,7 @@ class NewEmail extends React.Component<IProps, INewEmailState> {
         ...this.state.whenToStopMails,
         stopDate: this.state.whenToStopMails?.stopDate.toISOString()
       },
+      tickTime: this.state.tickTime,
     })
 
     const response = await fetch(url, {
