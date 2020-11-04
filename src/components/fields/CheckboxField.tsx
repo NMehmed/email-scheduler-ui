@@ -12,7 +12,7 @@ export default ({ label, value, handleChange }: ICheckboxFieldProps) => {
       <div className="control">
         <label className="checkbox">
           <input type="checkbox" defaultChecked={value} onChange={e => handleChange(e)} />
-            {label}
+          {label}
         </label>
       </div>
     </div>

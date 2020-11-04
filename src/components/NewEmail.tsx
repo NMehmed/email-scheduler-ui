@@ -136,23 +136,7 @@ class NewEmail extends React.Component<IProps, INewEmailState> {
       body
     }).then(res => res.json())
 
-    if (response.awesome) {
-      this.setState({
-        showAlert: true,
-        alertProps: {
-          status: 'success',
-          message: 'Mail sent successfully',
-        }
-      })
-    } else {
-      this.setState({
-        showAlert: true,
-        alertProps: {
-          status: 'error',
-          message: `Failed to send mail ${response.message ? response.message : ''}`
-        }
-      })
-    }
+    this.showAlert(response)
   }
 
   scheduleNewEmail = async () => {
@@ -179,12 +163,18 @@ class NewEmail extends React.Component<IProps, INewEmailState> {
       body
     }).then(res => res.json())
 
+    this.showAlert(response)
+  }
+
+  showAlert = (response: any) => {
     if (response.awesome) {
       this.setState({
         showAlert: true,
         alertProps: {
           status: 'success',
-          message: 'Scheduled successfully',
+          message: this.state.isRecurrent ?
+            'Scheduled successfully' :
+            'Sent successfully',
         }
       })
     } else {
@@ -192,7 +182,9 @@ class NewEmail extends React.Component<IProps, INewEmailState> {
         showAlert: true,
         alertProps: {
           status: 'error',
-          message: `Failed to schedule mail ${response.message ? response.message : ''}`
+          message: this.state.isRecurrent ?
+            `Failed to schedule mail ${response.message ? response.message : ''}` :
+            `Failed to send mail ${response.message ? response.message : ''}`
         }
       })
     }
@@ -209,8 +201,16 @@ class NewEmail extends React.Component<IProps, INewEmailState> {
             </div>
           </label>
         </div>
-        <WeekDaysPicker label="Repeat on:" values={this.state.whichWeeksDaysToBeSent} handleChange={this.weekdayChange} />
-        <NumberInputField label="Every month on that day" value={this.state.dayOfMonth} handleChange={this.dayOfMonthChange} min={1} max={31} />
+        <WeekDaysPicker
+          label="Repeat on:"
+          values={this.state.whichWeeksDaysToBeSent}
+          handleChange={this.weekdayChange} />
+        <NumberInputField
+          label="Every month on that day"
+          value={this.state.dayOfMonth}
+          handleChange={this.dayOfMonthChange}
+          min={1}
+          max={31} />
         <WhenToStopMailsField value={this.state.whenToStopMails} onChange={this.onWhenToStopMailsChange} />
       </div>
     )
@@ -220,18 +220,34 @@ class NewEmail extends React.Component<IProps, INewEmailState> {
     return (
       <div className="container" >
         {this.state.showAlert &&
-          <Alert message={this.state.alertProps.message} status={this.state.alertProps.status} onCloseClick={this.onAlertClose} />
+          <Alert message={this.state.alertProps.message}
+            status={this.state.alertProps.status}
+            onCloseClick={this.onAlertClose} />
         }
+
         <EmailField value={this.state.emailTo} handleChange={this.emailChange} />
-        <TextInputField label="Subject" placeholder="Email Subject" value={this.state.subject} handleChange={this.subjectChange} />
+        <TextInputField
+          label="Subject"
+          placeholder="Email Subject"
+          value={this.state.subject}
+          handleChange={this.subjectChange} />
         <TextAreaField value={this.state.message} handleChange={this.messageChange} />
-        <CheckboxField value={this.state.isRecurrent} handleChange={this.recurrentChange} label="Recurrent email" />
+        <CheckboxField
+          value={this.state.isRecurrent}
+          handleChange={this.recurrentChange}
+          label="Recurrent email" />
+
         {this.state.isRecurrent &&
           this.renderRecurrentMailOptions()
         }
+
         <div className="field is-grouped">
           <div className="control">
-            <button className={this.state.isLoading ? 'button is-primary is-loading' : 'button is-primary'} onClick={this.onSubmit}>Send</button>
+            <button
+              className={this.state.isLoading ? 'button is-primary is-loading' : 'button is-primary'}
+              onClick={this.onSubmit}>
+              Send
+            </button>
           </div>
         </div>
       </div>
