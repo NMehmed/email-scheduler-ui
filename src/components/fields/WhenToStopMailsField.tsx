@@ -18,15 +18,19 @@ class WhenToStopMailsField extends React.Component<IWhenToStopMailsFieldProps, I
   }
 
   onWhenToStopChange = (e: React.FormEvent<HTMLInputElement>) => {
-    this.setState({ whenToStop: e.currentTarget.value as WhenToStop }, this.props.onChange(this.state))
+    this.setState({ whenToStop: e.currentTarget.value as WhenToStop }, this.handleChange)
   }
 
   onDateChange = (date: Date) => {
-    this.setState({ stopDate: date }, this.props.onChange(this.state))
+    this.setState({ stopDate: date }, this.handleChange)
   }
 
   onOcurrancyChange = (e: React.FormEvent<HTMLInputElement>) => {
-    this.setState({ occurrancy: parseInt(e.currentTarget.value) }, this.props.onChange(this.state))
+    this.setState({ occurrancy: parseInt(e.currentTarget.value) }, this.handleChange)
+  }
+
+  handleChange = () => {
+    this.props.onChange(this.state)
   }
 
   render() {

@@ -11,6 +11,7 @@ import IWhenToStopMailsState from '../types/IWhenToStopMailsState'
 import WhenToStop from '../enums/WhenToStop'
 import TimePicker from 'rc-time-picker'
 import IAlertProps from '../types/IAlertProps'
+import moment, { Moment } from 'moment'
 
 import 'rc-time-picker/assets/index.css';
 import Alert from './alerts/Alert'
@@ -28,7 +29,7 @@ interface INewEmailState {
   isLoading: boolean,
   dayOfMonth: number | null,
   whenToStopMails: IWhenToStopMailsState,
-  tickTime: string | null,
+  tickTime: Moment,
   showAlert: boolean,
   alertProps: IAlertProps,
 }
@@ -46,7 +47,7 @@ class NewEmail extends React.Component<IProps, INewEmailState> {
       whichWeeksDaysToBeSent: [],
       isLoading: false,
       dayOfMonth: null,
-      tickTime: null,
+      tickTime: moment(),
       whenToStopMails: {
         whenToStop: WhenToStop.never,
         occurrancy: 1,
@@ -97,8 +98,8 @@ class NewEmail extends React.Component<IProps, INewEmailState> {
     this.setState({ whenToStopMails })
   }
 
-  onTickTimeChange = (time: any) => {
-    this.setState({ tickTime: time.format('HH:mm') })
+  onTickTimeChange = (time: Moment) => {
+    this.setState({ tickTime: time })
   }
 
   onAlertClose = () => {
@@ -161,12 +162,12 @@ class NewEmail extends React.Component<IProps, INewEmailState> {
       subject: this.state.subject,
       message: this.state.message,
       dayOfMonth: this.state.dayOfMonth,
-      weeksDays: this.state.whichWeeksDaysToBeSent,
+      weekdays: this.state.whichWeeksDaysToBeSent,
       whenToStopMails: {
         ...this.state.whenToStopMails,
         stopDate: this.state.whenToStopMails?.stopDate.toISOString()
       },
-      tickTime: this.state.tickTime,
+      tickTime: moment(this.state.tickTime).utc().format('HH:mm'),
     })
 
     const response = await fetch(url, {
@@ -204,12 +205,12 @@ class NewEmail extends React.Component<IProps, INewEmailState> {
           <label className="label">
             Time of day
             <div>
-              <TimePicker showSecond={false} onChange={this.onTickTimeChange} />
+              <TimePicker showSecond={false} onChange={this.onTickTimeChange} defaultValue={moment()} />
             </div>
           </label>
         </div>
         <WeekDaysPicker label="Repeat on:" values={this.state.whichWeeksDaysToBeSent} handleChange={this.weekdayChange} />
-        <NumberInputField label="Every day of month" value={this.state.dayOfMonth} handleChange={this.dayOfMonthChange} min={1} max={31} />
+        <NumberInputField label="Every month on that day" value={this.state.dayOfMonth} handleChange={this.dayOfMonthChange} min={1} max={31} />
         <WhenToStopMailsField value={this.state.whenToStopMails} onChange={this.onWhenToStopMailsChange} />
       </div>
     )

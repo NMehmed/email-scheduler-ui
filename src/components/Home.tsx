@@ -1,22 +1,6 @@
 import React from 'react'
 import { IMailSchedule } from '../types/IEmailSchedule'
-import IWhenToStopMailsState from '../types/IWhenToStopMailsState'
 import WhenToStop from '../enums/WhenToStop'
-
-const getActiveMailsSchedule = async () => {
-  const url = `${process.env.REACT_APP_API_SERVER_URL}/active-mails-schedule`
-
-  const response = await fetch(url, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    mode: 'cors',
-  }).then(res => res.json())
-
-  console.log(response)
-  console.log(response.length)
-}
 
 interface IProps {
 }
@@ -89,7 +73,7 @@ class Home extends React.Component<IProps, IHomeState> {
                 <th>Send To</th>
                 <th>Subject</th>
                 <th>Message</th>
-                <th>Time</th>
+                <th>Time(UTC)</th>
                 <th>Days of Week</th>
                 <th>Day Of Month</th>
                 <th>When To Stop</th>
